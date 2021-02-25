@@ -1,0 +1,4 @@
+github.com/azopat/k8-go-comm v1.1.1 h1:HMEWTXqQvMm7RdXkBlZzLq73YbHRdJlSjbbH4XCSgOA=
+github.com/azopat/k8-go-comm v1.1.1/go.mod h1:zcjSxbzIMyudjkG0Y7L7Rqpr1Q7VULcVjeE7DTytmyo=
+github.com/azopat/k8-go-comm v1.1.2-0.20210225022620-7a8a1c8a75cc h1:vUmGznZ5cBP6e3CMIzezclif99YlqSeuPCIZcqmOfAc=
+github.com/azopat/k8-go-comm v1.1.2-0.20210225022620-7a8a1c8a75cc/go.mod h1:zcjSxbzIMyudjkG0Y7L7Rqpr1Q7VULcVjeE7DTytmyo=
