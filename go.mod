@@ -2,4 +2,9 @@ module github.com/k8-proxy/icap-service-1
 
 go 1.15
 
-require github.com/azopat/k8-go-comm v1.1.2-0.20210225022620-7a8a1c8a75cc // indirect
+require (
+	github.com/azopat/k8-go-comm v1.1.2-0.20210225022620-7a8a1c8a75cc
+	github.com/k8-proxy/k8-go-comm v0.1.3
+	github.com/minio/minio-go/v7 v7.0.10
+	github.com/streadway/amqp v1.0.0
+)
