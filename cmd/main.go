@@ -20,7 +20,7 @@ var (
 
 	processing_exchange   = "processing-exchange"
 	processing_routingKey = "processing-request"
-	processing_queueName  = "processing-queue"
+	processing_queueName  = "processing-request-queue"
 
 	inputMount                     = os.Getenv("INPUT_MOUNT")
 	adaptationRequestQueueHostname = os.Getenv("ADAPTATION_REQUEST_QUEUE_HOSTNAME")
@@ -103,6 +103,7 @@ func processMessage(d amqp.Delivery) error {
 	}
 	log.Printf("File uploaded to minio successfully: %s", sourcePresignedURL.String())
 	d.Headers["source-presigned-url"] = sourcePresignedURL.String()
+	d.Headers["reply-to"] = d.ReplyTo
 
 	// Publish the details to Rabbit
 	err = rabbitmq.PublishMessage(publisher, processing_exchange, processing_routingKey, d.Headers, []byte(""))
