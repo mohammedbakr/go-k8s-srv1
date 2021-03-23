@@ -1,6 +1,6 @@
 # icap-service-1
 
-This service is as per the architecture the first proxy service that will get the file from icap-server and upload it to minio
+This is the service 1 of [this repo](https://github.com/k8-proxy/go-k8s-infra) that will get the file from icap-server and upload it to minio
 
 ### Steps of processing
 When it starts
@@ -17,28 +17,42 @@ When it starts
 ### Docker build
 - To build the docker image
 ```
+git clone https://github.com/k8-proxy/go-k8s-srv1.git
+cd k8-proxy/go-k8s-srv1
 docker build -t <docker_image_name> .
+```
+
+- To run the container
+First make sure that you have rabbitmq and minio running, then run the command bellow 
+
+```
+docker run -e ADAPTATION_REQUEST_QUEUE_HOSTNAME='<rabbit-host>' \ 
+-e ADAPTATION_REQUEST_QUEUE_PORT='<rabbit-port>' \
+-e MESSAGE_BROKER_USER='<rabbit-user>' \
+-e MESSAGE_BROKER_PASSWORD='<rabbit-password>' \
+-e MINIO_ENDPOINT='<minio-endpoint>' \ 
+-e MINIO_ACCESS_KEY='<minio-access>' \ 
+-e MINIO_SECRET_KEY='<minio-secret>' \ 
+-e MINIO_SOURCE_BUCKET='<bucket-to-upload-file>' \ 
+--name <docker_container_name> <docker_image_name>
 ```
 
 # Testing steps
 
-- Log in to the VM
-- Make sure that all the pods are running
+- Run the container as mentionned above
+
+- Publish data reference to rabbitMq on queue name : adaptation-request-queue with the following data(table) :
+* file-id : An ID for the file
+* source-file-location : The full path to the file
+* rebuilt-file-location : A full path representing the location where the rebuilt file will go to
+
+
+- Check your container logs to see the processing
 
 ```
-kubectl  -n icap-adaptation get pods
+docker logs <container name>
 ```
-
-- Start a test using the command bellow : If all is ok you will receive a result file.
-
-```
-mkdir /tmp/input
-cp <pdf_file_name> /tmp/input/
-docker run --rm -v /tmp/input:/opt/input -v /tmp/output:/opt/output glasswallsolutions/c-icap-client:manual-v1 -s 'gw_rebuild' -i <your vm IP> -f '/opt/input/<pdf_file_name>' -o /opt/output/<pdf_file_name> -v
-```
-
-During the test check logs of icap-service1 pods, they should have get and processed the file
 
 # Rebuild flow to implement
 
-![new-rebuild-flow-v2](https://user-images.githubusercontent.com/76431508/107766490-35064200-6d3c-11eb-8d63-ad64f29ce964.jpeg)
+![new-rebuild-flow-v2](https://github.com/k8-proxy/go-k8s-infra/raw/main/diagram/go-k8s-infra.png)
