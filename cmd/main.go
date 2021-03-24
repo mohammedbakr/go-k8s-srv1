@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/azopat/k8-go-comm/pkg/minio"
-	"github.com/azopat/k8-go-comm/pkg/rabbitmq"
+	"github.com/k8-proxy/k8-go-comm/pkg/minio"
+	"github.com/k8-proxy/k8-go-comm/pkg/rabbitmq"
 	"github.com/streadway/amqp"
 
 	miniov7 "github.com/minio/minio-go/v7"
@@ -20,7 +20,7 @@ var (
 
 	processing_exchange   = "processing-exchange"
 	processing_routingKey = "processing-request"
-	processing_queueName  = "processing-queue"
+	processing_queueName  = "processing-request-queue"
 
 	inputMount                     = os.Getenv("INPUT_MOUNT")
 	adaptationRequestQueueHostname = os.Getenv("ADAPTATION_REQUEST_QUEUE_HOSTNAME")
@@ -50,14 +50,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
+	defer publisher.Close()
 
 	// Start a consumer
-	msgs, err := rabbitmq.NewQueueConsumer(connection, queueName, exchange, routingKey)
+	msgs, ch, err := rabbitmq.NewQueueConsumer(connection, queueName, exchange, routingKey)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
+	defer ch.Close()
 
-	minioClient, err = minio.NewMinioClient(minioEndpoint, minioAccessKey, minioSecretKey, false)
+	minioClient, err = minio.NewMinioClient(minioEndpoint, minioAccessKey, minioSecretKey, true)
+
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
@@ -95,15 +98,19 @@ func processMessage(d amqp.Delivery) error {
 	// Upload the source file to Minio and Get presigned URL
 	sourcePresignedURL, err := minio.UploadAndReturnURL(minioClient, sourceMinioBucket, input, time.Second*60*60*24)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
-	d.Headers["source-presigned-url"] = sourcePresignedURL
+	log.Printf("File uploaded to minio successfully: %s", sourcePresignedURL.String())
+	d.Headers["source-presigned-url"] = sourcePresignedURL.String()
+	d.Headers["reply-to"] = d.ReplyTo
 
 	// Publish the details to Rabbit
 	err = rabbitmq.PublishMessage(publisher, processing_exchange, processing_routingKey, d.Headers, []byte(""))
 	if err != nil {
 		return err
 	}
+	log.Printf("Message published to the processing queue : exchange : %s , routing key : %s , source-presigned-url : %s", processing_exchange, processing_routingKey, sourcePresignedURL.String())
 
 	return nil
 }
