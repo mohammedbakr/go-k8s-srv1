@@ -110,5 +110,3 @@ docker logs <container name>
 # Rebuild flow to implement
 
 ![new-rebuild-flow-v2](https://github.com/k8-proxy/go-k8s-infra/raw/main/diagram/go-k8s-infra.png)
-
-docker run -e ADAPTATION_REQUEST_QUEUE_HOSTNAME=172.17.0.2 -e ADAPTATION_REQUEST_QUEUE_PORT=5672 -e MESSAGE_BROKER_USER=guest -e MESSAGE_BROKER_PASSWORD=guest -e MINIO_ENDPOINT=localhost:9000 -e MINIO_ACCESS_KEY=minioadmin -e MINIO_SECRET_KEY=minioadmin -e MINIO_SOURCE_BUCKET=test-icap-bucket --name srv1-app srv1
