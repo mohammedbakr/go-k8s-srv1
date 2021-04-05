@@ -1,4 +1,4 @@
-module github.com/k8-proxy/icap-service-1
+module github.com/k8-proxy/go-k8s-srv1
 
 go 1.16
 
