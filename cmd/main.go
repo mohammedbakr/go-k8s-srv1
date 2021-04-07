@@ -16,11 +16,11 @@ import (
 var (
 	AdpatationReuquestExchange   = "adaptation-request-exchange"
 	AdpatationReuquestRoutingKey = "adaptation-request"
-	AdpatationReuquestQueueName  = "adaptation-request-queue"
+	AdpatationReuquestQueueName  = "adaptation-request"
 
 	ProcessingRequestExchange   = "processing-request-exchange"
 	ProcessingRequestRoutingKey = "processing-request"
-	ProcessingRequestQueueName  = "processing-request-queue"
+	ProcessingRequestQueueName  = "processing-request"
 
 	inputMount                     = os.Getenv("INPUT_MOUNT")
 	adaptationRequestQueueHostname = os.Getenv("ADAPTATION_REQUEST_QUEUE_HOSTNAME")
