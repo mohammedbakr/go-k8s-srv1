@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	AdpatationReuquestExchange   = "adaptation-request-exchange"
+	AdpatationReuquestExchange   = "adaptation-exchange"
 	AdpatationReuquestRoutingKey = "adaptation-request"
 	AdpatationReuquestQueueName  = "adaptation-request-queue"
 
