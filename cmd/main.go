@@ -14,13 +14,13 @@ import (
 )
 
 var (
-	exchange   = "adaptation-exchange"
-	routingKey = "adaptation-request"
-	queueName  = "adaptation-request-queue"
+	AdpatationReuquestExchange   = "adaptation-exchange"
+	AdpatationReuquestRoutingKey = "adaptation-request"
+	AdpatationReuquestQueueName  = "adaptation-request-queue"
 
-	processing_exchange   = "processing-exchange"
-	processing_routingKey = "processing-request"
-	processing_queueName  = "processing-request-queue"
+	ProcessingRequestExchange   = "processing-request-exchange"
+	ProcessingRequestRoutingKey = "processing-request"
+	ProcessingRequestQueueName  = "processing-request-queue"
 
 	inputMount                     = os.Getenv("INPUT_MOUNT")
 	adaptationRequestQueueHostname = os.Getenv("ADAPTATION_REQUEST_QUEUE_HOSTNAME")
@@ -46,23 +46,37 @@ func main() {
 	}
 
 	// Initiate a publisher on processing exchange
-	publisher, err = rabbitmq.NewQueuePublisher(connection, processing_exchange)
+	publisher, err = rabbitmq.NewQueuePublisher(connection, ProcessingRequestExchange)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
 	defer publisher.Close()
 
 	// Start a consumer
-	msgs, ch, err := rabbitmq.NewQueueConsumer(connection, queueName, exchange, routingKey)
+	msgs, ch, err := rabbitmq.NewQueueConsumer(connection, AdpatationReuquestQueueName, AdpatationReuquestExchange, AdpatationReuquestRoutingKey)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
 	defer ch.Close()
 
-	minioClient, err = minio.NewMinioClient(minioEndpoint, minioAccessKey, minioSecretKey, true)
+	minioClient, err = minio.NewMinioClient(minioEndpoint, minioAccessKey, minioSecretKey, false)
 
 	if err != nil {
 		log.Fatalf("%s", err)
+	}
+
+	exist, err := minio.CheckIfBucketExists(minioClient, sourceMinioBucket)
+	if err != nil {
+		log.Println("error minio connection")
+		return
+	}
+	if !exist {
+
+		err := minio.CreateNewBucket(minioClient, sourceMinioBucket)
+		if err != nil {
+			log.Println("error creating minio")
+			return
+		}
 	}
 
 	forever := make(chan bool)
@@ -106,11 +120,11 @@ func processMessage(d amqp.Delivery) error {
 	d.Headers["reply-to"] = d.ReplyTo
 
 	// Publish the details to Rabbit
-	err = rabbitmq.PublishMessage(publisher, processing_exchange, processing_routingKey, d.Headers, []byte(""))
+	err = rabbitmq.PublishMessage(publisher, ProcessingRequestExchange, ProcessingRequestRoutingKey, d.Headers, []byte(""))
 	if err != nil {
 		return err
 	}
-	log.Printf("Message published to the processing queue : exchange : %s , routing key : %s , source-presigned-url : %s", processing_exchange, processing_routingKey, sourcePresignedURL.String())
+	log.Printf("Message published to the processing queue : exchange : %s , routing key : %s , source-presigned-url : %s", ProcessingRequestExchange, ProcessingRequestRoutingKey, sourcePresignedURL.String())
 
 	return nil
 }
