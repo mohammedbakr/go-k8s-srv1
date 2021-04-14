@@ -3,8 +3,8 @@
 <h1 align="center">icap-service-1</h1>
 
 <p align="center">
-    <a href="https://github.com/k8-proxy/go-k8s-srv1/actions/workflows/build.yml">
-        <img src="https://github.com/k8-proxy/go-k8s-srv1/actions/workflows/build.yml/badge.svg"/>
+    <a href="https://github.com/k8-proxy/go-k8s-srv1/actions/workflows/build.yaml">
+        <img src="https://github.com/k8-proxy/go-k8s-srv1/actions/workflows/build.yaml/badge.svg"/>
     </a>
     <a href="https://codecov.io/gh/k8-proxy/go-k8s-srv1">
         <img src="https://codecov.io/gh/k8-proxy/go-k8s-srv1/branch/main/graph/badge.svg"/>
