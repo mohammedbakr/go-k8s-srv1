@@ -32,6 +32,7 @@ var (
 	minioAccessKey    = os.Getenv("MINIO_ACCESS_KEY")
 	minioSecretKey    = os.Getenv("MINIO_SECRET_KEY")
 	sourceMinioBucket = os.Getenv("MINIO_SOURCE_BUCKET")
+	cleanMinioBucket  = os.Getenv("MINIO_CLEAN_BUCKET")
 
 	publisher   *amqp.Channel
 	minioClient *miniov7.Client
@@ -67,14 +68,28 @@ func main() {
 
 	exist, err := minio.CheckIfBucketExists(minioClient, sourceMinioBucket)
 	if err != nil {
-		log.Println("error minio connection")
+		log.Println("error minio connection", err)
 		return
 	}
 	if !exist {
 
 		err := minio.CreateNewBucket(minioClient, sourceMinioBucket)
 		if err != nil {
-			log.Println("error creating minio")
+			log.Println("error creating source  minio bucket ")
+			return
+		}
+	}
+
+	exist, err = minio.CheckIfBucketExists(minioClient, cleanMinioBucket)
+	if err != nil {
+		log.Println("error minio connection", err)
+		return
+	}
+	if !exist {
+
+		err := minio.CreateNewBucket(minioClient, cleanMinioBucket)
+		if err != nil {
+			log.Println("error creating clean minio bucket")
 			return
 		}
 	}
