@@ -68,28 +68,28 @@ func main() {
 
 	exist, err := minio.CheckIfBucketExists(minioClient, sourceMinioBucket)
 	if err != nil {
-		log.Println("error minio connection", err)
+		log.Println("error minio connection :", err)
 		return
 	}
 	if !exist {
 
 		err := minio.CreateNewBucket(minioClient, sourceMinioBucket)
 		if err != nil {
-			log.Println("error creating source  minio bucket ")
+			log.Println("error creating source  minio bucket :", err)
 			return
 		}
 	}
 
 	exist, err = minio.CheckIfBucketExists(minioClient, cleanMinioBucket)
 	if err != nil {
-		log.Println("error minio connection", err)
+		log.Println("error minio connection :", err)
 		return
 	}
 	if !exist {
 
 		err := minio.CreateNewBucket(minioClient, cleanMinioBucket)
 		if err != nil {
-			log.Println("error creating clean minio bucket")
+			log.Println("error creating clean minio bucket :", err)
 			return
 		}
 	}
