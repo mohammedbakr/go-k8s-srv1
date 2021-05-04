@@ -19,6 +19,6 @@ jobs:
 
       - name: Build
         run: go build -o go-k8s-srv1 ./cmd
-# Tests disabled till dependencies are resolved
-#      - name: Test
-#       run: go test ./...
+
+      - name: Build Docker Image
+        run: docker build .
